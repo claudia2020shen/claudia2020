@@ -1,1 +1,93 @@
+import numpy
+import pandas as pd
+df_data = pd.read_csv('...')
+df_data
+
+from sklearn import preprocessing
+
+def prepare_data(df_data):
+    df=df_data.drop(['Number'],axis=1) 
+    
+    ndarray_data = df.values 
+    
+    features = ndarray_data[:,1:]   
+    label = ndarray_data[:,0]    
+    
+    minmax_scale = preprocessing.MinMaxScaler(feature_range=(0,1))
+    norm_features = minmax_scale.fit_transform(features)
+    
+    return norm_features,label
+   
+shuffled_df_data=df_data.sample(frac=1)
+x_data,y_data = prepare_data(shuffled_df_data)
+
+x_train = x_data
+y_train = y_data
+
+test_data = pd.read_csv('....')
+from sklearn import preprocessing
+
+def prepare_data(test_data):
+    test=test_data.drop(['Number'],axis=1) 
+    
+    testndarray_data = test.values  
+    
+    features = testndarray_data[:,1:]  
+    label = testndarray_data[:,0]  
+    minmax_scale = preprocessing.MinMaxScaler(feature_range=(0,1))
+    norm_features = minmax_scale.fit_transform(features)
+    
+    return norm_features,label
+    
+test_data
+xtest_data,ytest_data = prepare_data(test_data)
+x_test = xtest_data
+y_test = ytest_data
+
 import tensorflow as tf
+model = tf.keras.models.Sequential()
+model.add(tf.keras.layers.Dense(units=16,
+                                input_dim=26,
+                                use_bias=True,
+                                kernel_initializer='uniform',
+                                bias_initializer='zeros',
+                                activation='relu'))
+model.add(tf.keras.layers.Dense(units=32,
+                                activation='relu'))
+model.add(tf.keras.layers.Dense(units=32,
+                                activation='relu'))
+model.add(tf.keras.layers.Dense(units=32,
+                                activation='sigmoid'))
+model.add(tf.keras.layers.Dense(units=32,
+                                activation='sigmoid'))
+model.add(tf.keras.layers.Dense(units=1,
+                                activation='sigmoid'))
+model.summary()
+model.compile(optimizer=tf.keras.optimizers.Adam(0.003),
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+train_history=model.fit(x=x_train,
+                        y=y_train,
+                        validation_split=0.2,
+                        epochs=100,
+                        batch_size=40,
+                        verbose=2)
+
+
+import matplotlib.pyplot as plt
+def visu_train_history(train_history,train_metric,validation_metric):
+    plt.plot(train_history.history[train_metric])
+    plt.plot(train_history.history[validation_metric])
+    plt.title('Train History')
+    plt.ylabel(train_metric)
+    plt.xlabel('epoch')
+    plt.legend(['train','validation'],loc='upper left')
+    plt.savefig('plot100.svg',dpi=600,format='svg')
+    plt.show()
+    
+visu_train_history(train_history,'accuracy','val_accuracy')
+visu_train_history(train_history,'loss','val_loss')
+
+evaluate_result = model.evaluate(x=x_test,
+                                 y=y_test)
+model.save('------.h5')
